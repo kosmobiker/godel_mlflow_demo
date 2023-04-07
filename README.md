@@ -98,4 +98,25 @@ Some alternatives:
 
 ## Case study
 
-to be continued
+***Poland OLX House Price Q122***
+
+60,000+ house prices in over 600+ cities in Poland
+
+Data is availible [here](https://www.kaggle.com/datasets/g1llar/poland-olx-house-price-q122).
+
+Features description:
+- `offer_title`: offer title
+- `price`: price in PLN
+- `price_per_meter`: price in PLN for square meter
+- `offer_type`: as value name
+- `floor`: floor number for -1 --> basement, 0 --> Ground Floor, 10 --> floor 10+, 11 --> attic
+- `area`: area in square meters
+- `rooms`: number of rooms for 4 --> rooms 4+
+- `offer_type_of_building`: as value name
+- `market`: as value name
+- `city_name`: name of city where home is
+- `voivodeship`: name of voivodeship where home is
+- `month`: data download month
+- `year`: data download year
+- `population`: city population where home is
+- `longitude` and `latitude`: city coord
