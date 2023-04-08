@@ -9,6 +9,7 @@ pandas = "*"
 numpy = "*"
 awswrangler = "*"
 scikit-learn = "*"
+mlflow = "*"
 
 [dev-packages]
 ipykernel = "*"
