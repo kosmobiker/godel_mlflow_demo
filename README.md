@@ -1,24 +1,23 @@
 # Godel MLflow demo
 
-<img src="https://cdn.bulldogjob.com/system/companies/logos/000/002/343/original/godel_logo_colored.png"  width="500" height="150">
+<img src="https://cdn.bulldogjob.com/system/companies/logos/000/002/343/original/godel_logo_colored.png"  width="400" height="180">
 
-Small demo for Cozy Godel DS catchups
+A small demo for Cozy Godel DS Catchup
 
 ## Agenda:
 
-1. What is MLflow
+1. What is MLflow?
 2. How to install MLflow and run it?
 3. Case study: House pricing predictions
-4. 
-
-
-## Experiment tracking:
+ 
+## What is MLflow?
+### Experiment tracking:
 
 Keeping track of all the relevant information from an ML experiment; varies from experiment to experiment. Experiment tracking helps with Reproducibility, Organization and Optimization
 
 Tracking experiments in spreadsheets helps but falls short in all the key points.
 
-## MLflow:
+### MLflow:
 
 *"An Open source platform for the machine learning lifecycle"*
 
@@ -30,25 +29,21 @@ It's a Python package with four main modules:
 - Tracking
 - Models
 - Model registry
-- Projects (Out of scope of the course)
+- Projects (Out of scope of the catchup)
 
 Tracking experiments with MLflow:
 
  - MLflow organizes experiments into runs and keeps track of any variables that may affect the model as well as its result; Such as: Parameters, Metrics, Metadata, the Model itself...
 - MLflow also automatically logs extra information about each run such as: Source Code, Git Commit, Start and End time and Author.
 
-## Installing MLflow:
-```bash
-pip: pip install mlflow
-```
-or
-```bash
-conda: conda install -c conda-forge mlflow
-```
+## How to install MLflow and run it?
+### Installing MLflow:
 
-## MLFlow in practice
+`pip: pip install mlflow` or `conda: conda install -c conda-forge mlflow`
 
-Exists differents scenaries with work with ml models:
+### MLFlow in practice
+
+Exists differents scenarious with work with ml models:
 
 - Single data scientist, generally competition model (kaggle or another)
 - Cross functional team with one data scientist, in this exists only one model but someone in the company can check the model and how to recreate
@@ -78,11 +73,44 @@ A example of this scenaries is:
 
 More info about deployment of MLflow is [here](https://mlflow.org/docs/latest/tracking.html).
 
-- Some benefits in remote server are:
 
-    + shared experiments
-    + collaborate
-    + give more visibility of the data
+### Architecture overview
+
+General scheme of our MLflow architecrure:
+
+<img src="https://mlflow.org/docs/latest/_images/scenario_4.png"  width="500" height="500">
+
+
+Installation is not difficult. You can easyly adopt it for your cloud infrastructure.
+
+We wiil use:
+
+- **EC2** to host a Tracking server, `t2.micro` is ok
+- **S3** to store artifacts
+- **AWS RDS** for backend, I use `t4g.micro` with Postgres - more than enough 
+
+
+Lifehacks:
+```bash
+Do not forget to customize Security groups and add inbound rules!
+Check you IAM roles!
+Make sure you can access your S3 buckets from the EC2!
+```
+
+Command to start Tracking server 
+
+```bash
+mlflow server -h 0.0.0.0 -p 5000 --backend-store-uri postgresql://DB_USER:DB_PASSWORD@DB_ENDPOINT:5432/DB_NAME --default-artifact-root s3://S3_BUCKET_NAME
+```
+More info is [here](https://github.com/kosmobiker/mlops-zoomcamp/blob/main/02-experiment-tracking/mlflow_on_aws.md).
+
+### More about Mlflow
+
+Some benefits in remote server are:
+
++ shared experiments
++ collaborate
++ give more visibility of the data
 
 Some limitations of MLFlow:
 
@@ -96,9 +124,9 @@ Some alternatives:
 + comet
 + weights & biases
 
-## Case study
+## Case study: House pricing predictions
 
-***Poland OLX House Price Q122***
+***Poland OLX House Price Q1 2022***
 
 60,000+ house prices in over 600+ cities in Poland
 
@@ -120,3 +148,4 @@ Features description:
 - `year`: data download year
 - `population`: city population where home is
 - `longitude` and `latitude`: city coord
+
