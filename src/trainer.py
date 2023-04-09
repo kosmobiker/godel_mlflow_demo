@@ -6,8 +6,6 @@ import logging
 from typing import Tuple
 
 import mlflow
-from mlflow.tracking import MlflowClient
-from mlflow.entities import ViewType
 
 import sklearn
 from sklearn.model_selection import train_test_split
@@ -25,7 +23,8 @@ from sklearn.model_selection import cross_validate
 
 
 TRACKING_SERVER_HOST = "ec2-34-250-13-150.eu-west-1.compute.amazonaws.com"
-PATH_DATA = 's3://test-bucket-vlad-godel/data/olx_house_price_Q122.csv'
+EXPERIMENT_NAME = 'godel-cozy-ds'
+DATA_PATH = 's3://test-bucket-vlad-godel/data/olx_house_price_Q122.csv'
 SEED = 42
  
 logging.basicConfig(level=logging.INFO, format='%(name)s - %(levelname)s - %(message)s')
@@ -57,11 +56,12 @@ class Trainer():
         logging.debug(f"Pandas version is {pd.__version__}")
         logging.debug(f"Scikit-learn version is {sklearn.__version__}")
         logging.debug(f"MLflow version is {mlflow.__version__}")
-        df = wr.s3.read_csv([self.data_path], encoding='utf-8')
         logging.info(f"Get data from S3")
-        categorical_features = ['offer_type', 'offer_type_of_building',
-                            'market', 'voivodeship', 'month']
+        df = wr.s3.read_csv([self.data_path], encoding='utf-8')
+                
+        categorical_features = ['offer_type', 'offer_type_of_building', 'market', 'voivodeship', 'month']
         numeric_features = ['floor', 'area', 'rooms', 'longitude', 'latitude']
+        
         df = df[(df["price"] <= df["price"].quantile(0.95)) & (df["price"] >= df["price"].quantile(0.05))]
         categorical_transformer = Pipeline(steps=[
             ('imputer', SimpleImputer(strategy='constant', fill_value='missing')),
@@ -84,16 +84,13 @@ class Trainer():
         
         return X_train_transformed, X_test_transformed, y_train, y_test
     
-    def train(self) -> Tuple[str, str]:
+    def train(self) -> None:
         """This function trains several models 
         and track them into MLflow
 
         Args:
             X_train_transformed (np.array): Train dataset
-            y_train (np.array): Target variable
-
-        Returns:
-            Tuple[str, str]: id of exeriment and id of best run
+            y_train (np.array): Train target variable
         """
         logging.info(f"tracking URI: '{mlflow.get_tracking_uri()}'")
         models = (
@@ -110,9 +107,12 @@ class Trainer():
                 estimator = model_class[0]()
                 cv_results = cross_validate(estimator,
                             self.X_train_transformed, self.y_train,
-                            cv=5, n_jobs=-1,
-                            scoring=('neg_mean_absolute_percentage_error',
-                                    'neg_root_mean_squared_error'),
+                            cv=5,
+                            n_jobs=-1,
+                            scoring=(
+                                'neg_mean_absolute_percentage_error',
+                                'neg_root_mean_squared_error'
+                                    ),
                             return_train_score=True)
                 mean_test_mape = cv_results['test_neg_mean_absolute_percentage_error'].mean()
                 mean_train_mape = cv_results['train_neg_mean_absolute_percentage_error'].mean()
@@ -127,7 +127,7 @@ class Trainer():
         
 
 if __name__ == "__main__":
-    trainer = Trainer("my-experiment-godel22", PATH_DATA)
+    trainer = Trainer(EXPERIMENT_NAME, DATA_PATH)
     trainer.train()
     
             
