@@ -1,6 +1,6 @@
 # Godel MLflow demo
 
-<img src="https://cdn.bulldogjob.com/system/companies/logos/000/002/343/original/godel_logo_colored.png"  width="400" height="180">
+<img src="https://cdn.bulldogjob.com/system/companies/logos/000/002/343/original/godel_logo_colored.png"  width="600" height="200">
 
 A small demo for Cozy Godel DS Catchup
 
@@ -9,15 +9,17 @@ A small demo for Cozy Godel DS Catchup
 1. What is MLflow?
 2. How to install MLflow and run it?
 3. Case study: House pricing predictions
+    * Model Selection
+    * Hyperparameter Optimization 
  
 ## What is MLflow?
 ### Experiment tracking:
 
-Keeping track of all the relevant information from an ML experiment; varies from experiment to experiment. Experiment tracking helps with Reproducibility, Organization and Optimization
+Keeping track of all the relevant information from an ML experiment; varies from experiment to experiment. Experiment tracking helps with Reproducibility, Organization and Optimization.
 
 Tracking experiments in spreadsheets helps but falls short in all the key points.
 
-### MLflow:
+### MLflow Modules:
 
 *"An Open source platform for the machine learning lifecycle"*
 
@@ -33,7 +35,7 @@ It's a Python package with four main modules:
 
 Tracking experiments with MLflow:
 
- - MLflow organizes experiments into runs and keeps track of any variables that may affect the model as well as its result; Such as: Parameters, Metrics, Metadata, the Model itself...
+- MLflow organizes experiments into runs and keeps track of any variables that may affect the model as well as its result; Such as: Parameters, Metrics, Metadata, the Model itself...
 - MLflow also automatically logs extra information about each run such as: Source Code, Git Commit, Start and End time and Author.
 
 ## How to install MLflow and run it?
@@ -43,30 +45,30 @@ Tracking experiments with MLflow:
 
 ### MLFlow in practice
 
-Exists differents scenarious with work with ml models:
+Exists different scenarios with work with ML models:
 
-- Single data scientist, generally competition model (kaggle or another)
+- Single data scientist, generally competition model (Kaggle or another)
 - Cross functional team with one data scientist, in this exists only one model but someone in the company can check the model and how to recreate
 - multiple data scientist that work in multiple ml models, in this point is necessary get a control of deploys and how to is created every model
 
-A example of this scenaries is:
+An example of this scenarios is:
 
 - MLFlow run in local
 
-    + in this scenario is create a default folder with name mlruns, and in this is created the default experiment in folder 0 and only using yml meta
+    + in this scenario is create a default folder with name `mlruns`, and in this is created the default experiment in folder 0 and only using yml meta
     + If another experiment is created this take the number 1 and save all data in artifacts
     + if run mlflow ui this load all experiments to show
 
 - MLFlow using a local database and tracking server
 
-    + generraly is used when I need test multiple hyper parameters in the model
-    + is necesary run mlflow server and add where is saved the artifacts
-    + this created one folder artifacts_local, in this is saved the artifacts of model with metadata
+    + generally is used when I need test multiple hyper parameters in the model
+    + is necessary run mlflow server and add where is saved the artifacts
+    + this created one folder `artifacts_local`, in this is saved the artifacts of model with metadata
 
 - MLFlow remote
 
     + in this scenario generally is used when multiple data scientist work in multiple model
-    + using a remote server (EC2 in case of AWS), S3 to save artifacts and RDS (postgresql)
+    + using a remote server (EC2 in case of AWS), S3 to save artifacts and RDS (PostgreSQL)
     + here is used the url of server
     + a good practice in this case is use ec2-role to access in S3, is not a good idea use a IAM user
     + another good practice is block the port and public access to RDS and use the EC2 to connect
@@ -76,14 +78,14 @@ More info about deployment of MLflow is [here](https://mlflow.org/docs/latest/tr
 
 ### Architecture overview
 
-General scheme of our MLflow architecrure:
+General scheme of our MLflow architecture:
 
 <img src="https://mlflow.org/docs/latest/_images/scenario_4.png"  width="500" height="500">
 
 
-Installation is not difficult. You can easyly adopt it for your cloud infrastructure.
+Installation is not difficult. You can easily adopt it for your cloud infrastructure.
 
-We wiil use:
+We will use:
 
 - **EC2** to host a Tracking server, `t2.micro` is ok
 - **S3** to store artifacts
@@ -120,17 +122,19 @@ Some limitations of MLFlow:
 
 Some alternatives:
 
-+ Neptune
-+ comet
-+ weights & biases
++ [Neptune](https://neptune.ai/)
++ [Comet](https://www.comet.com/site/)
++ [Weights & Biases](https://wandb.ai/site)
++ AWS SageMaker
++ many others...
 
 ## Case study: House pricing predictions
 
 ***Poland OLX House Price Q1 2022***
 
-60,000+ house prices in over 600+ cities in Poland
+60,000+ house prices in over 600+ cities in Poland. Analyses of the pricing and brand based on OLX Portal
 
-Data is availible [here](https://www.kaggle.com/datasets/g1llar/poland-olx-house-price-q122).
+Data is available [here](https://www.kaggle.com/datasets/g1llar/poland-olx-house-price-q122).
 
 Features description:
 - `offer_title`: offer title
@@ -148,4 +152,6 @@ Features description:
 - `year`: data download year
 - `population`: city population where home is
 - `longitude` and `latitude`: city coord
+
+
 
