@@ -153,5 +153,10 @@ Features description:
 - `population`: city population where home is
 - `longitude` and `latitude`: city coord
 
+Dataset contains 62818 records about house pricing in Poland in Q1 2022 with 15 features. Our aim is to predict house price based on other features. We will use `MLflow` to track our experiments. 
 
+In the first experiment, we will try to train several models, track them and compare results.
+It will be a simple `Scikitlearn` pipeline which will take our data and train 4 different models. We will compare metrics (**RMSE** and **MAPE**) on cross validation and choose the best one.
+
+In the second experiment, we will try to optimize hyperparameters of the best model using `Optuna` and `MLflow`. We will use `XGboost` model to achieve better results. Our goal is to run `XGBoost` cross validating, find best hyperparameters, track the results, register best model and use it for predictions on holdout dataset.
 

@@ -1,3 +1,4 @@
+"""This module contains simple trainer to demonstrate Mlflow functions"""
 import pandas as pd
 import awswrangler as wr
 import numpy as np
@@ -128,9 +129,5 @@ class Trainer():
 
 if __name__ == "__main__":
     trainer = Trainer(EXPERIMENT_NAME, DATA_PATH)
-    trainer.train()
-    
-            
-            
-        
-        
+    trainer.train()   
+    logging.info("Oh, We Happy")
