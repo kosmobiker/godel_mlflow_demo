@@ -1,4 +1,4 @@
-"""This module contains simple trainer to demonstrate Mlflow functions"""
+"""This module contains simple trainer to demonstrate Mlflow functionality"""
 import pandas as pd
 import awswrangler as wr
 import numpy as np
@@ -7,6 +7,8 @@ import logging
 from typing import Tuple
 
 import mlflow
+from mlflow.tracking import MlflowClient
+
 
 import sklearn
 from sklearn.model_selection import train_test_split
@@ -24,7 +26,7 @@ from sklearn.model_selection import cross_validate
 
 
 TRACKING_SERVER_HOST = "ec2-34-250-13-150.eu-west-1.compute.amazonaws.com"
-EXPERIMENT_NAME = 'godel-cozy-ds'
+EXPERIMENT_NAME = 'godel-cozy-ds-simple-trainer'
 DATA_PATH = 's3://test-bucket-vlad-godel/data/olx_house_price_Q122.csv'
 SEED = 42
  
