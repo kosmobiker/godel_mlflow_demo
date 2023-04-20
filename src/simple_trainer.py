@@ -3,13 +3,9 @@ import pandas as pd
 import awswrangler as wr
 import numpy as np
 import logging
-
 from typing import Tuple
-
 import mlflow
 from mlflow.tracking import MlflowClient
-
-
 import sklearn
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
@@ -25,10 +21,11 @@ from sklearn.neighbors import KNeighborsRegressor
 from sklearn.model_selection import cross_validate
 
 
-TRACKING_SERVER_HOST = "ec2-34-250-13-150.eu-west-1.compute.amazonaws.com"
-EXPERIMENT_NAME = 'godel-cozy-ds-simple-trainer'
+TRACKING_SERVER_HOST = "ec2-34-242-123-148.eu-west-1.compute.amazonaws.com"
+EXPERIMENT_NAME = 'godel_cozy_ds-simple_trainer'
 DATA_PATH = 's3://test-bucket-vlad-godel/data/olx_house_price_Q122.csv'
 SEED = 42
+ 
  
 logging.basicConfig(level=logging.INFO, format='%(name)s - %(levelname)s - %(message)s')
 mlflow.set_tracking_uri(f"http://{TRACKING_SERVER_HOST}:5000")
@@ -42,7 +39,7 @@ class Trainer():
         self.experiment_name = experiment_name
         self.data_path = data_path
         if self.experiment_name:
-            mlflow.set_experiment(experiment_name)
+            mlflow.set_experiment(self.experiment_name)
         self.X_train_transformed, self.X_test_transformed, self.y_train, self.y_test = self.preprocess(data_path)
 
 
@@ -107,6 +104,7 @@ class Trainer():
             with mlflow.start_run():
                 mlflow.log_param("Train datset size", self.X_train_transformed.shape)
                 mlflow.log_param("model", model_class[1])
+                mlflow.log_param("seed", SEED)
                 estimator = model_class[0]()
                 cv_results = cross_validate(estimator,
                             self.X_train_transformed, self.y_train,
@@ -127,6 +125,7 @@ class Trainer():
                 mlflow.log_metric("mean_train_rmse", mean_train_rmse)
                 mlflow.sklearn.log_model(estimator, artifact_path="models")
                 mlflow.end_run()
+        logging.info('Training has successfully finished')
         
 
 if __name__ == "__main__":
