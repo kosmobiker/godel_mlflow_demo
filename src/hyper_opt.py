@@ -29,7 +29,7 @@ DATA_PATH = 's3://test-bucket-vlad-godel/data/olx_house_price_Q122.csv'
 MODEL_NAME = 'house_pricing_xgboost_model'
 SEED = 42
 N_TRIALS = 50
-TIMEOUT = 3600
+TIMEOUT = 3600 # 1 hour
 
 
 logging.basicConfig(level=logging.INFO, format='%(name)s - %(levelname)s - %(message)s')
