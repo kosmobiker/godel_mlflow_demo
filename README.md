@@ -92,11 +92,15 @@ We will use:
 - **AWS RDS** for backend, I use `t4g.micro` with Postgres - more than enough 
 
 
-Lifehacks:
+
+
+Some usefull commands to install and setup the MLflow on EC2:
+
 ```bash
-Do not forget to customize Security groups and add inbound rules!
-Check you IAM roles!
-Make sure you can access your S3 buckets from the EC2!
+sudo yum update
+sudo yum -y install python-pip
+pip3 install mlflow boto3 psycopg2-binary
+aws configure
 ```
 
 Command to start Tracking server 
@@ -105,6 +109,12 @@ Command to start Tracking server
 mlflow server -h 0.0.0.0 -p 5000 --backend-store-uri postgresql://DB_USER:DB_PASSWORD@DB_ENDPOINT:5432/DB_NAME --default-artifact-root s3://S3_BUCKET_NAME
 ```
 More info is [here](https://github.com/kosmobiker/mlops-zoomcamp/blob/main/02-experiment-tracking/mlflow_on_aws.md).
+
+Lifehacks:
+* Do not forget to customize Security groups and add inbound rules!
+* Check you IAM roles!
+* Make sure you can access your S3 buckets from the EC2!
+* Do not forget about ports: `5432` for Postgres and `5000` for MLflow server
 
 ### More about Mlflow
 
@@ -127,6 +137,7 @@ Some alternatives:
 + [Weights & Biases](https://wandb.ai/site)
 + AWS SageMaker
 + many others...
+
 
 ## Case study: House pricing predictions
 
@@ -159,4 +170,5 @@ In the first experiment, we will try to train several models, track them and com
 It will be a simple `Scikitlearn` pipeline which will take our data and train 4 different models. We will compare metrics (**RMSE** and **MAPE**) on cross validation and choose the best one.
 
 In the second experiment, we will try to optimize hyperparameters of the best model using `Optuna` and `MLflow`. We will use `XGboost` model to achieve better results. Our goal is to run `XGBoost` cross validating, find best hyperparameters, track the results, register best model and use it for predictions on holdout dataset.
+
 
