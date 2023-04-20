@@ -28,7 +28,7 @@ EXPERIMENT_NAME = 'godel-cozy-ds-hyperopt'
 DATA_PATH = 's3://test-bucket-vlad-godel/data/olx_house_price_Q122.csv'
 MODEL_NAME = 'house_pricing_xgboost_model'
 SEED = 42
-N_TRIALS = 30
+N_TRIALS = 50
 TIMEOUT = 3600
 
 
@@ -131,12 +131,12 @@ class HyperOpt():
                 'reg_alpha': trial.suggest_float('reg_alpha', 10e-5, 10.0,  log=True),
                 'reg_lambda': trial.suggest_float('reg_lambda', 10e-5, 10.0, log=True),
                 }
-            pruning_callback = optuna.integration.XGBoostPruningCallback(trial, "test-mape")
+            pruning_callback = optuna.integration.XGBoostPruningCallback(trial, "test-rmse")
             history = xgb.cv(search_space,
                             self.dtrain,
                             folds=RepeatedKFold(n_splits=4, n_repeats=2),
-                            num_boost_round=300,
-                            early_stopping_rounds=50,
+                            num_boost_round=500,
+                            early_stopping_rounds=30,
                             seed=SEED,
                             callbacks=[pruning_callback])
             mlflow.log_param("Optuna_trial_num", trial.number)
@@ -149,7 +149,7 @@ class HyperOpt():
             mlflow.log_metric("mean_test_rmse", mean_test_rmse)
             mlflow.log_metric("mean_train_mape", mean_train_mape)
             mlflow.log_metric("mean_test_mape", mean_test_mape)
-            return mean_test_mape
+            return mean_test_rmse
     
         pruner = optuna.pruners.MedianPruner(n_warmup_steps=10)
         study = optuna.create_study(

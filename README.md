@@ -2,29 +2,29 @@
 
 <img src="https://cdn.bulldogjob.com/system/companies/logos/000/002/343/original/godel_logo_colored.png"  width="600" height="200">
 
-A small demo for Cozy Godel DS Catchup
+***A small demo for Cozy Godel DS Catchup***
+___
 
 ## Agenda:
 
 1. What is MLflow?
 2. How to install MLflow and run it?
-3. Case study: House pricing predictions
-    * Model Selection
+3. Optuna
+4. Case study: House pricing predictions
+    * Simple Trainer
     * Hyperparameter Optimization 
+
+___
  
 ## What is MLflow?
-### Experiment tracking:
-
-Keeping track of all the relevant information from an ML experiment; varies from experiment to experiment. Experiment tracking helps with Reproducibility, Organization and Optimization.
-
-Tracking experiments in spreadsheets helps but falls short in all the key points.
-
-### MLflow Modules:
 
 *"An Open source platform for the machine learning lifecycle"*
 
 <img src="https://mlflow.org/images/MLflow-logo-final-white-TM.png"  width="500" height="200">
 
+[**Mlflow**](https://mlflow.org/docs/latest/index.html) is an open-source platform for the complete machine learning life cycle that allows data scientists to manage their end-to-end machine learning workflow. It provides tools for tracking experiments, packaging code into reproducible runs, and sharing and deploying models. Mlflow is designed to work with a variety of machine learning libraries and languages and supports popular storage and deployment platforms. Mlflow helps data scientists to keep track of their experiments, share their results with others, and reproduce their work in a systematic and organized way.
+
+### MLflow Modules:
 
 It's a Python package with four main modules:
 
@@ -33,25 +33,41 @@ It's a Python package with four main modules:
 - Model registry
 - Projects (Out of scope of the catchup)
 
+### Experiment tracking:
+
+Keeping track of all the relevant information from an ML experiment; varies from experiment to experiment. Experiment tracking helps with Reproducibility, Organization and Optimization.
+
+Tracking experiments in spreadsheets helps but falls short in all the key points.
+
 Tracking experiments with MLflow:
 
 - MLflow organizes experiments into runs and keeps track of any variables that may affect the model as well as its result; Such as: Parameters, Metrics, Metadata, the Model itself...
 - MLflow also automatically logs extra information about each run such as: Source Code, Git Commit, Start and End time and Author.
 
+### Models module:
+
+MLflow's Models module is a component of the MLflow platform that provides a simple and consistent way of packaging machine learning models in multiple formats and deploying them to a variety of production environments. It enables you to track different versions of your models and their respective metrics, as well as to register, manage, and deploy models to production. MLflow Models supports various model formats including Python functions, PyTorch, TensorFlow, Scikit-Learn, and XGBoost, and allows you to deploy models in various ways, including locally, to a server, to a cloud platform like AWS or Azure, or to a container platform like Docker or Kubernetes.
+
+### Model registry:
+
+MLflow's Model Registry module is a centralized model store that allows teams to collaboratively manage and version control models throughout their entire lifecycle, from experimentation to production deployment. It provides a UI and API for model registration, versioning, sharing, and managing access control. Model Registry allows users to track model lineage and lineage artifacts, manage model approval and staging, and deploy models to production. It also provides the ability to create a model version history, to compare models, and to set up alerts for changes in model performance or metadata. Model Registry supports a range of machine learning frameworks and deployment tools, making it easier to integrate with your existing infrastructure.
+
 ## How to install MLflow and run it?
 ### Installing MLflow:
+
+It can be easily installed using `pip` or `conda`:
 
 `pip: pip install mlflow` or `conda: conda install -c conda-forge mlflow`
 
 ### MLFlow in practice
 
-Exists different scenarios with work with ML models:
+Exists different scenarios of working with ML models:
 
 - Single data scientist, generally competition model (Kaggle or another)
 - Cross functional team with one data scientist, in this exists only one model but someone in the company can check the model and how to recreate
-- multiple data scientist that work in multiple ml models, in this point is necessary get a control of deploys and how to is created every model
+- Multiple data scientist that work in multiple ml models, in this point is necessary get a control of deploys and how to is created every model
 
-An example of this scenarios is:
+Examples of such scenarios are:
 
 - MLFlow run in local
 
@@ -91,10 +107,7 @@ We will use:
 - **S3** to store artifacts
 - **AWS RDS** for backend, I use `t4g.micro` with Postgres - more than enough 
 
-
-
-
-Some usefull commands to install and setup the MLflow on EC2:
+Some useful commands to install and setup the MLflow on EC2:
 
 ```bash
 sudo yum update
@@ -137,6 +150,21 @@ Some alternatives:
 + [Weights & Biases](https://wandb.ai/site)
 + AWS SageMaker
 + many others...
+
+## Optuna
+
+Optuna is an open-source hyperparameter optimization framework for Python. It provides a lightweight interface for defining and running hyperparameter optimization tasks, including support for various state-of-the-art algorithms for sampling and pruning hyperparameter search spaces. With Optuna, you can easily optimize the hyperparameters of a machine learning model, neural network architecture, or any other type of model that requires tuning of multiple parameters. Optuna also provides a powerful visualization toolkit for analyzing the results of hyperparameter optimization experiments.
+
+### How Optuna works?
+
+Optuna uses an algorithm called Tree-structured Parzen Estimator (TPE) to choose hyperparameters. TPE is a type of Bayesian optimization algorithm that models the relationship between hyperparameters and the objective function being optimized. It maintains two probability distributions: one for the hyperparameters that have been suggested so far and one for the objective function evaluated at those hyperparameters. Based on these probability distributions, TPE decides which hyperparameters to try next. This process continues until the maximum number of trials is reached or until the algorithm converges to a solution. By using TPE, Optuna is able to efficiently explore the hyperparameter space and find good configurations in a relatively small number of trials.
+
+In Optuna, a pruner is a mechanism that decides whether to stop a trial (i.e., terminate the training of a specific set of hyperparameters) earlier than the maximum number of iterations (or the maximum training time) specified. Pruning can help speed up the hyperparameter search by avoiding wasting computational resources on unpromising hyperparameters.
+
+### Types of pruning
+Optuna has several built-in pruning algorithms, such as `MedianPruner`, `PercentilePruner`, and `SuccessiveHalvingPruner`, among others. These pruning algorithms work differently and decide when to prune based on various criteria. For example, `MedianPruner` prunes if the current trial's intermediate value is below the median of previously reported values at that step. The `PercentilePruner` prunes if the current trial's intermediate value is below the defined percentile of previously reported values. The `SuccessiveHalvingPruner` prunes the trials with the lowest intermediate values after each successive halving.
+
+Overall, the decision to prune a trial is based on a tradeoff between the cost of continuing the trial and the potential reward (i.e., improving the model's performance) if the trial continues. Pruning allows the algorithm to quickly discard unpromising hyperparameters and focus more resources on the more promising ones.
 
 
 ## Case study: House pricing predictions
