@@ -24,7 +24,7 @@ from sklearn.model_selection import cross_validate
 TRACKING_SERVER_HOST = "ec2-34-242-123-148.eu-west-1.compute.amazonaws.com"
 EXPERIMENT_NAME = 'godel_cozy_ds-simple_trainer'
 DATA_PATH = 's3://test-bucket-vlad-godel/data/olx_house_price_Q122.csv'
-SEED = 42
+SEED = 111
  
  
 logging.basicConfig(level=logging.INFO, format='%(name)s - %(levelname)s - %(message)s')
