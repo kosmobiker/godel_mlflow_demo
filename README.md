@@ -107,7 +107,10 @@ We will use:
 - **S3** to store artifacts
 - **AWS RDS** for backend, I use `t4g.micro` with Postgres - more than enough 
 
+The diagram of out AWS infrastructure is on the picture below:
+
 Some useful commands to install and setup the MLflow on EC2:
+![Label](infrastructure//infra.drawio.svg)
 
 ```bash
 sudo yum update
