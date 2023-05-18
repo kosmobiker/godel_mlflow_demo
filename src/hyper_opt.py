@@ -1,11 +1,11 @@
 """This module contains class for hyperparameter optimization to demonstrate Mlflow functionality"""
-import pandas as pd
-import awswrangler as wr
-import numpy as np
 import logging
 import time
 import pickle
 from typing import Tuple
+import pandas as pd
+import awswrangler as wr
+import numpy as np
 import mlflow
 from mlflow.tracking import MlflowClient
 import xgboost as xgb
@@ -15,12 +15,11 @@ import sklearn
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import StandardScaler
 from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer, SimpleImputer
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.model_selection import RepeatedKFold
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score, mean_absolute_percentage_error 
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score, mean_absolute_percentage_error
 
 
 TRACKING_SERVER_HOST = "ec2-34-242-123-148.eu-west-1.compute.amazonaws.com"
@@ -96,7 +95,7 @@ class HyperOpt():
         return X_train_transformed, X_test_transformed, y_train, y_test
     
     
-    def find_best_parameters(self) -> optuna.trial._frozen.FrozenTrial:
+    def find_best_parameters(self):
         """
         The `find_best_parameters` method searches for the best hyperparameters 
         for the XGBoost model using Optuna
@@ -106,7 +105,7 @@ class HyperOpt():
         """
         
         @mlflc.track_in_mlflow()
-        def objective(trial) -> float:
+        def _objective(trial) -> float:
             """
             The objective function for an Optuna study that tunes hyperparameters for an XGBoost model using cross-validation.
             Returns the mean test MAPE (mean absolute percentage error) of the tuned model.
@@ -135,7 +134,7 @@ class HyperOpt():
             history = xgb.cv(search_space,
                             self.dtrain,
                             folds=RepeatedKFold(n_splits=4, n_repeats=2),
-                            num_boost_round=500,
+                            num_boost_round=300,
                             early_stopping_rounds=30,
                             seed=SEED,
                             callbacks=[pruning_callback])
@@ -156,12 +155,11 @@ class HyperOpt():
                         study_name=f"{self.experiment_name}",
                         pruner=pruner,
                         direction="minimize")
-        study.optimize(objective, n_trials=self.n_trials, timeout=self.timeout, callbacks=[mlflc])
+        study.optimize(_objective, n_trials=self.n_trials, timeout=self.timeout, callbacks=[mlflc])
         logging.info(f"Number of finished trials: {len(study.trials)}")
         mlflow.xgboost.autolog()
         best = study.best_trial
         logging.info(f"Best params: {best.params.items()}")
-        
         return best
     
     
@@ -221,4 +219,5 @@ if __name__ == "__main__":
     hyperopt = HyperOpt(EXPERIMENT_NAME, DATA_PATH, MODEL_NAME, N_TRIALS, TIMEOUT)
     hyperopt.find_best_parameters()
     hyperopt.evaluate_and_register()        
-    logging.info("Oh, We Happy")   
+    logging.info("Oh, We Happy")
+       
