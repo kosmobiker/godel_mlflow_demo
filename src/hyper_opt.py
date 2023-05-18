@@ -70,6 +70,7 @@ class HyperOpt():
         df = wr.s3.read_csv([self.data_path], encoding='utf-8')
         categorical_features = ['offer_type', 'offer_type_of_building', 'market', 'voivodeship', 'month']
         numeric_features = ['floor', 'area', 'rooms', 'longitude', 'latitude']
+        df = df[df['floor'].isna() == False]
         df = df[(df["price"] <= df["price"].quantile(0.95)) & (df["price"] >= df["price"].quantile(0.05))]
         categorical_transformer = Pipeline(steps=[
             ('imputer', SimpleImputer(strategy='constant', fill_value='missing')),
