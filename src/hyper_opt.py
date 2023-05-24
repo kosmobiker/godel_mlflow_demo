@@ -22,7 +22,7 @@ from sklearn.model_selection import RepeatedKFold
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score, mean_absolute_percentage_error
 
 
-TRACKING_SERVER_HOST = "ec2-34-242-123-148.eu-west-1.compute.amazonaws.com"
+TRACKING_SERVER_HOST = "ec2-54-154-180-50.eu-west-1.compute.amazonaws.com"
 EXPERIMENT_NAME = 'godel-cozy-ds-hyperopt'
 DATA_PATH = 's3://test-bucket-vlad-godel/data/olx_house_price_Q122.csv'
 MODEL_NAME = 'house_pricing_xgboost_model'
@@ -131,7 +131,7 @@ class HyperOpt():
                 'reg_alpha': trial.suggest_float('reg_alpha', 10e-5, 10.0,  log=True),
                 'reg_lambda': trial.suggest_float('reg_lambda', 10e-5, 10.0, log=True),
                 }
-            pruning_callback = optuna.integration.XGBoostPruningCallback(trial, "test-rmse")
+            pruning_callback = optuna.integration.XGBoostPruningCallback(trial, "test-mape")
             history = xgb.cv(search_space,
                             self.dtrain,
                             folds=RepeatedKFold(n_splits=4, n_repeats=2),
