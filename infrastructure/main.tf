@@ -8,9 +8,16 @@ resource "aws_security_group" "ec2_sg" {
   name_prefix = "ec2_sg"
   
   ingress {
-    from_port = 5000
-    to_port = 5000
-    protocol = "tcp"
+    from_port   = 5000
+    to_port     = 5000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
@@ -20,7 +27,7 @@ resource "aws_instance" "mlflow-tracking-server" {
   ami = "ami-09dd5f12915cfb387"
   instance_type = "t2.micro"
   vpc_security_group_ids = [aws_security_group.ec2_sg.id]
-
+  key_name = "godel_keypair"
   tags = {
     Name = "mlflow"
   }
@@ -31,9 +38,16 @@ resource "aws_security_group" "rds_sg" {
   name_prefix = "rds_sg"
   
   ingress {
-    from_port = 5432
-    to_port = 5432
-    protocol = "tcp"
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
@@ -44,10 +58,9 @@ resource "aws_db_instance" "mlflow-backend-db" {
   engine = "postgres"
   engine_version = "14.6"
   instance_class = "db.t4g.micro"
-  name = "mlflow"
+  db_name = "mlflow"
   username = "mlflow"
   password = "password123"
-  parameter_group_name = "default.postgres12"
   skip_final_snapshot = true
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
 }
