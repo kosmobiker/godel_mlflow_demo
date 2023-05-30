@@ -6,6 +6,13 @@ provider "aws" {
 # Create a security group for the EC2 instance
 resource "aws_security_group" "ec2_sg" {
   name_prefix = "ec2_sg"
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
   
   ingress {
     from_port   = 5000
@@ -36,6 +43,13 @@ resource "aws_instance" "mlflow-tracking-server" {
 # Create a security group for the RDS instance
 resource "aws_security_group" "rds_sg" {
   name_prefix = "rds_sg"
+  
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
   
   ingress {
     from_port   = 5432
