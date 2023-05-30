@@ -22,14 +22,13 @@ from sklearn.model_selection import RepeatedKFold
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score, mean_absolute_percentage_error
 
 
-TRACKING_SERVER_HOST = "ec2-54-154-180-50.eu-west-1.compute.amazonaws.com"
+TRACKING_SERVER_HOST = "ec2-3-253-112-217.eu-west-1.compute.amazonaws.com"
 EXPERIMENT_NAME = 'godel-cozy-ds-hyperopt'
 DATA_PATH = 's3://test-bucket-vlad-godel/data/olx_house_price_Q122.csv'
 MODEL_NAME = 'house_pricing_xgboost_model'
 SEED = 42
-N_TRIALS = 50
+N_TRIALS = 100
 TIMEOUT = 3600 # 1 hour
-
 
 logging.basicConfig(level=logging.INFO, format='%(name)s - %(levelname)s - %(message)s')
 mlflow.set_tracking_uri(f"http://{TRACKING_SERVER_HOST}:5000")
@@ -68,7 +67,7 @@ class HyperOpt():
         logging.debug(f"MLflow version is {mlflow.__version__}")
         logging.info(f"Get data from S3")
         df = wr.s3.read_csv([self.data_path], encoding='utf-8')
-        categorical_features = ['offer_type', 'offer_type_of_building', 'market', 'voivodeship', 'month']
+        categorical_features = ['offer_type', 'offer_type_of_building', 'market']
         numeric_features = ['floor', 'area', 'rooms', 'longitude', 'latitude']
         df = df.dropna(axis=0)
         df = df[(df["price"] <= df["price"].quantile(0.95)) & (df["price"] >= df["price"].quantile(0.05))]
@@ -77,7 +76,7 @@ class HyperOpt():
             ('encoder', OneHotEncoder(drop='first', sparse_output=False, handle_unknown='infrequent_if_exist', min_frequency=2000))
                 ])
         numeric_transformer = Pipeline(steps=[
-                ('imputer', IterativeImputer(initial_strategy='mean', max_iter=5, random_state=SEED, verbose=0)),
+                # ('imputer', IterativeImputer(initial_strategy='mean', max_iter=5, random_state=SEED, verbose=0)),
                 ('scaler' , StandardScaler())
                     ])
         preprocessor = ColumnTransformer(
@@ -124,19 +123,19 @@ class HyperOpt():
                 'verbosity': 0,
                 'eta': trial.suggest_float('eta', 0.001, 0.3),
                 'gamma': trial.suggest_float('gamma', 0.001, 10, log=True),
-                'max_depth': trial.suggest_int('max_depth', 5, 10),
+                'max_depth': trial.suggest_int('max_depth', 5, 15),
                 'subsample': trial.suggest_float('subsample', 0.5, 1.0),
                 'colsample_bytree': trial.suggest_float('colsample_bytree', 0.5, 1.0),
-                'min_child_weight': trial.suggest_int('min_child_weight', 1, 100),
+                'min_child_weight': trial.suggest_int('min_child_weight', 10, 100),
                 'reg_alpha': trial.suggest_float('reg_alpha', 10e-5, 10.0,  log=True),
                 'reg_lambda': trial.suggest_float('reg_lambda', 10e-5, 10.0, log=True),
                 }
             pruning_callback = optuna.integration.XGBoostPruningCallback(trial, "test-mape")
             history = xgb.cv(search_space,
                             self.dtrain,
-                            folds=RepeatedKFold(n_splits=4, n_repeats=2),
-                            num_boost_round=300,
-                            early_stopping_rounds=30,
+                            folds=RepeatedKFold(n_splits=3, n_repeats=2),
+                            num_boost_round=250,
+                            early_stopping_rounds=25,
                             seed=SEED,
                             callbacks=[pruning_callback])
             mlflow.log_param("Optuna_trial_num", trial.number)
@@ -149,7 +148,8 @@ class HyperOpt():
             mlflow.log_metric("mean_test_rmse", mean_test_rmse)
             mlflow.log_metric("mean_train_mape", mean_train_mape)
             mlflow.log_metric("mean_test_mape", mean_test_mape)
-            return mean_test_rmse
+            
+            return mean_test_mape
     
         pruner = optuna.pruners.MedianPruner(n_warmup_steps=10)
         study = optuna.create_study(
@@ -161,6 +161,7 @@ class HyperOpt():
         mlflow.xgboost.autolog()
         best = study.best_trial
         logging.info(f"Best params: {best.params.items()}")
+        
         return best
     
     
@@ -178,6 +179,7 @@ class HyperOpt():
         mape = mean_absolute_percentage_error(true, pred)
         rmse = mean_squared_error(true, pred, squared=False)
         r2 = r2_score(true, pred)
+        
         return mae, mape, rmse, r2
     
     
@@ -194,7 +196,7 @@ class HyperOpt():
             model = xgb.train(
                         dtrain=self.dtrain,
                         params=self.best_trial.params,
-                        num_boost_round=300)
+                        num_boost_round=250)
             y_pred_train = model.predict(self.dtrain)
             y_pred_test = model.predict(self.dtest)
             train_mae, train_mape, train_rmse, train_r2 = self._metrics(self.y_train, y_pred_train)

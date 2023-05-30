@@ -166,3 +166,5 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+model.xgb
+infrastructure/.terraform.lock.hcl

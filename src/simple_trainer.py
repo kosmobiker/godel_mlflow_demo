@@ -21,7 +21,7 @@ from sklearn.neighbors import KNeighborsRegressor
 from sklearn.model_selection import cross_validate
 
 
-TRACKING_SERVER_HOST = "ec2-54-154-180-50.eu-west-1.compute.amazonaws.com"
+TRACKING_SERVER_HOST = "ec2-3-253-112-217.eu-west-1.compute.amazonaws.com"
 EXPERIMENT_NAME = 'godel_cozy_ds-simple_trainer'
 DATA_PATH = 's3://test-bucket-vlad-godel/data/olx_house_price_Q122.csv'
 SEED = 666 
@@ -58,7 +58,7 @@ class Trainer():
         logging.info(f"Get data from S3")
         df = wr.s3.read_csv([self.data_path], encoding='utf-8')
                 
-        categorical_features = ['offer_type', 'offer_type_of_building', 'market', 'voivodeship', 'month']
+        categorical_features = ['offer_type', 'offer_type_of_building', 'market']
         numeric_features = ['floor', 'area', 'rooms', 'longitude', 'latitude']
         df = df.dropna(axis=0)
         df = df[(df["price"] <= df["price"].quantile(0.95)) & (df["price"] >= df["price"].quantile(0.05))]
