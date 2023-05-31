@@ -26,9 +26,9 @@ TRACKING_SERVER_HOST = "ec2-3-253-112-217.eu-west-1.compute.amazonaws.com"
 EXPERIMENT_NAME = 'godel-cozy-ds-hyperopt'
 DATA_PATH = 's3://test-bucket-vlad-godel/data/olx_house_price_Q122.csv'
 MODEL_NAME = 'house_pricing_xgboost_model'
-SEED = 42
+SEED = 20230531
 N_TRIALS = 100
-TIMEOUT = 3600 # 1 hour
+TIMEOUT = 2*60*60 # 2 hour
 
 logging.basicConfig(level=logging.INFO, format='%(name)s - %(levelname)s - %(message)s')
 mlflow.set_tracking_uri(f"http://{TRACKING_SERVER_HOST}:5000")
@@ -133,8 +133,8 @@ class HyperOpt():
             pruning_callback = optuna.integration.XGBoostPruningCallback(trial, "test-mape")
             history = xgb.cv(search_space,
                             self.dtrain,
-                            folds=RepeatedKFold(n_splits=3, n_repeats=2),
-                            num_boost_round=250,
+                            folds=RepeatedKFold(n_splits=4, n_repeats=2),
+                            num_boost_round=500,
                             early_stopping_rounds=25,
                             seed=SEED,
                             callbacks=[pruning_callback])
@@ -196,7 +196,7 @@ class HyperOpt():
             model = xgb.train(
                         dtrain=self.dtrain,
                         params=self.best_trial.params,
-                        num_boost_round=250)
+                        num_boost_round=500)
             y_pred_train = model.predict(self.dtrain)
             y_pred_test = model.predict(self.dtest)
             train_mae, train_mape, train_rmse, train_r2 = self._metrics(self.y_train, y_pred_train)
